@@ -1,25 +1,43 @@
 <template>
-  <h1 class="w-fit bg-green-300 text-white mx-auto p-4">Login page</h1>
+  <div class="w-full mx-auto h-screen content-center">
+    <div class="w-[50%] mx-auto p-5 border-2 border-green-500 rounded-xl">
+      <h1 class="w-fit font-bold text-xl capitalize mx-auto p-4">Login page</h1>
 
-  <Form
-    :resolver="resolver"
-    :initialValues="initialValues"
-    @submit="onFormSubmit"
-    class="flex justify-center flex-col gap-4 w-[50%] mx-auto"
-  >
-    <div class="flex flex-col gap-1">
-      <InputText name="email" type="text" placeholder="Email" />
-      <Message severity="error">Message Content</Message>
+      <Form
+        :resolver="resolver"
+        :initialValues="initialValues"
+        @submit="submit"
+        class="flex justify-center flex-col gap-4 w-full mx-auto"
+      >
+        <div class="flex flex-col gap-1">
+          <InputText
+            name="email"
+            type="email"
+            v-model="form.email"
+            placeholder="Email"
+          />
+          <Message severity="error">Message Content</Message>
+        </div>
+        <div class="">
+          <Password v-model="form.password" toggleMask />
+        </div>
+        <Button type="submit" severity="secondary" label="Submit" />
+      </Form>
     </div>
-    <div class="">
-      <Password v-model="value" toggleMask />
-    </div>
-    <Button type="submit" severity="secondary" label="Submit" />
-  </Form>
+  </div>
 </template>
 
 <script setup>
 import { ref } from "vue";
-
-const value = ref(null);
+import axiosClient from "../../axios";
+const form = ref({
+  email: "",
+  password: "",
+});
+function submit() {
+  axiosClient.post("auth/login", form.value).then((res) => {
+    navigateTo("/");
+    console.log(res.data);
+  });
+}
 </script>

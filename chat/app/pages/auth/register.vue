@@ -1,37 +1,73 @@
 <template>
-  <h1 class="w-fit bg-green-300 text-white mx-auto p-4">register page</h1>
+  <div class="w-full h-screen content-center">
+    <div class="w-[50%] mx-auto p-5 border-2 border-green-500 rounded-xl">
+      <h1 class="w-fit font-bold text-xl capitalize mx-auto p-4 mb-10">
+        register page
+      </h1>
 
-  <Form
-    :resolver="resolver"
-    :initialValues="initialValues"
-    @submit="onFormSubmit"
-    class="flex justify-center flex-col gap-4 w-[50%] mx-auto"
-  >
-    <div class="flex flex-col gap-1">
-      <InputText name="username" type="text" placeholder="Username" />
+      <Form
+        :resolver="resolver"
+        :initialValues="initialValues"
+        class="flex justify-center flex-col gap-4 w-full mx-auto"
+        @submit="submit"
+      >
+        <div class="flex flex-col gap-1">
+          <InputText
+            name="username"
+            type="text"
+            v-model="form.name"
+            placeholder="Username"
+          />
+        </div>
+        <div class="flex flex-col gap-1">
+          <InputText
+            name="email"
+            type="text"
+            v-model="form.email"
+            placeholder="Email"
+          />
+        </div>
+        <div class="w-full">
+          <Password placeholder="password" v-model="form.password" toggleMask />
+        </div>
+        <div class="">
+          <Password
+            name="confirm"
+            placeholder="confirm"
+            :feedback="false"
+            class="w-fit"
+            v-model="form.confirm"
+            fluid
+            toggleMask
+          />
+        </div>
+        <Button
+          type="submit"
+          severity="secondary"
+          label="Submit"
+          class="w-fit"
+        />
+      </Form>
     </div>
-    <div class="flex flex-col gap-1">
-      <InputText name="email" type="text" placeholder="Email" />
-    </div>
-    <div class="w-full">
-      <Password placeholder="password" toggleMask />
-    </div>
-    <div class="">
-      <Password
-        name="password"
-        placeholder="Password"
-        :feedback="false"
-        class="w-fit"
-        fluid
-        toggleMask
-      />
-    </div>
-    <Button type="submit" severity="secondary" label="Submit" class="w-fit" />
-  </Form>
+  </div>
 </template>
  
  <script setup>
 import { ref } from "vue";
-
+// import type Password from "~/components/password.vue";
+import axiosClient from "../../axios";
 const value = ref(null);
+const form = ref({
+  name: "",
+  email: "",
+  password: "",
+  confirm: "",
+});
+console.log(form.value);
+function submit(e) {
+  axiosClient.post("auth/register", form.value).then((res) => {
+    navigateTo("/");
+    console.log(res.data);
+  });
+}
 </script>

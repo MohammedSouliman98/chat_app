@@ -59,10 +59,10 @@
           :key="index"
         >
           <Message
-            class="w-[50%] flex justify-end"
+            class="w-[50%] flex justify-start"
             :severity="m.recive ? m.color : selectedColor"
           >
-            <div class="flex gap-7 justify-end items-center mb-2">
+            <div class="flex gap-7 justify-start items-center mb-2">
               <span class="text-white">{{ m.date }}</span>
               <h1 class="text-white">{{ m.username }}</h1>
             </div>
