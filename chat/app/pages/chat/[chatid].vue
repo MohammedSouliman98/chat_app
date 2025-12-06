@@ -11,16 +11,20 @@
         chat with
         <span class="text-xl">{{ reciver || route.params.chatid }}</span>
       </h1>
-      <div class="chat h-[75%] overflow-y-auto" id="chat">
+      <div class="chat h-[75%] overflow-y-auto p-3" id="chat">
         <div
           class="w-full flex my-3"
-          :class="m.recive ? 'justify-start' : 'justify-end'"
+          :class="
+            currentuserid !== m.senderId ? 'justify-start' : 'justify-end'
+          "
           v-for="(m, index) in messages"
           :key="index"
         >
           <Message
             class="w-[50%] flex"
-            :class="m.recive ? 'justify-start' : 'justify-end'"
+            :class="
+              currentuserid !== m.senderId ? 'justify-start' : 'justify-end'
+            "
             :severity="m.recive ? m.color : route.query.color"
           >
             <div class="flex gap-7 justify-start items-center mb-2">
@@ -52,6 +56,7 @@ import axiosClient from "~/axios";
 var socket;
 const route = useRoute();
 const reciver = ref("");
+const currentuserid = useCookie("userinfo").value.id;
 const chatid = route.params.chatid;
 
 const message = ref({
@@ -85,8 +90,8 @@ onMounted(() => {
       username: useCookie("userinfo").value.name,
     });
     socket.on("message-room", (m) => {
-      // messages.value = m;
-      console.log(m);
+      messages.value = m;
+      // console.log(m);
     });
     socket.on("user-joined", (data) => {
       pushmessage(data);

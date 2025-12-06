@@ -2,16 +2,22 @@
   <h1>Welcome to the Chat Application</h1>
   <div class="flex flex-row justify-between md:w-[60%] mx-auto">
     <div class="w-full">
-      <div class="w-full flex justify-between bg-green-500 p-4">
-        <div class="flex gap-4">
-          <h1 class="font-bold text-xl">Clone whatsapp</h1>
-          <select name="" v-model="selectedColor" id="">
+      <div class="w-full flex flex-row justify-between bg-green-500 p-4">
+        <h1 class="font-bold text-xl">Clone whatsapp</h1>
+        <div class="grid max-sm:grid-cols-1 grid-cols-2 gap-4 h-fit">
+          <select name="" class="p-2" v-model="selectedColor" id="">
             <option value="" disabled>selectcolor</option>
             <option v-for="(color, index) in colors" :key="index">
               {{ color }}
             </option>
           </select>
-          <select name="" v-model="selectedUser" id="" :disabled="selectedRoom">
+          <select
+            name=""
+            class="p-2"
+            v-model="selectedUser"
+            id=""
+            :disabled="selectedRoom"
+          >
             <option value="" disabled>select user</option>
             <option
               :value="user.id"
@@ -33,7 +39,7 @@
             @click="startchat"
           ></Button>
         </div>
-        <Button label="Logout" @click="logout" />
+        <Button label="Logout" class="h-fit" @click="logout" />
       </div>
     </div>
   </div>

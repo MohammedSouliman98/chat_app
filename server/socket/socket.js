@@ -41,8 +41,8 @@ const initsocket = (server) => {
     });
 
     socket.on("join-room", (data) => {
-      socket.emit("message-room", messages);
       let { room, userId, date, username } = data;
+      io.emit("message-room", messages.get(room));
       socket.join(room);
       const welcomemessage = {
         type: "room",
@@ -56,8 +56,6 @@ const initsocket = (server) => {
       socket.to(room).emit("user-joined", welcomemessage);
 
       socket.on("message-group", (m) => {
-        console.log(messages);
-
         const { content, senderId, date, username, color } = m;
         const messagegroup = {
           type: "room",
@@ -68,7 +66,11 @@ const initsocket = (server) => {
           color: color,
           recive: true,
         };
-        messages.set(room, messagegroup);
+        if (!messages.has(room)) {
+          messages.set(room, []);
+        }
+        messages.get(room).push(messagegroup);
+
         socket.to(room).emit("recive-message", messagegroup);
       });
     });
