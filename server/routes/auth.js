@@ -5,13 +5,31 @@ import dotenv from "dotenv";
 import bcrypt from "bcryptjs";
 dotenv.config();
 import User from "../models/Users.js";
+// import authMiddleware from "../middleware/auth.js";
+
+function authMiddleware(req, res, next) {
+  const token = req.header("Authorization")?.replace("Bearer ", "");
+
+  console.log("token :", token);
+  if (!token) {
+    return res.status(401).json({ error: "No token provided" });
+  }
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_ACCESS_SECRET);
+    req.user = decoded;
+    next();
+  } catch (error) {
+    res.status(401).json({ error: "Invalid token" });
+  }
+}
 
 function createAccessToken(user) {
   return jwt.sign(
     { name: user.name, email: user.email, id: user.id },
     process.env.JWT_ACCESS_SECRET,
     {
-      expiresIn: process.env.ACCESS_TOKEN_EXPIRES || "900s",
+      expiresIn: process.env.ACCESS_TOKEN_EXPIRES || "90000s",
     }
   );
 }
@@ -83,6 +101,24 @@ router.post("/login", async (req, res) => {
     });
   } catch (error) {
     res.status(500).json({ message: "Server error", error: error.message });
+  }
+});
+
+router.post("/logout", authMiddleware, async (req, res) => {
+  try {
+    const user = await User.findByPk(req.user.id);
+    res.json({ message: "Logged out successfully" });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+router.get("/getalluser", authMiddleware, async (req, res) => {
+  try {
+    const users = await User.findAll();
+    res.json(users);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
 });
 

@@ -63,9 +63,16 @@ const form = ref({
   password: "",
   confirm: "",
 });
-console.log(form.value);
+const token = useCookie("token").value;
+if (token) {
+  navigateTo("/");
+}
+// console.log(form.value);
 function submit(e) {
   axiosClient.post("auth/register", form.value).then((res) => {
+    // localStorage.setItem("token", res.data.token);
+    useCookie("token").value = res.data.token;
+    useCookie("userinfo").value = res.data.user;
     navigateTo("/");
     console.log(res.data);
   });

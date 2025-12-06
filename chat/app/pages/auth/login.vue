@@ -30,12 +30,30 @@
 <script setup>
 import { ref } from "vue";
 import axiosClient from "../../axios";
+
+const token = useCookie("token").value;
+
+if (token) {
+  navigateTo("/");
+}
+
+// definePageMeta({
+//   middleware: [
+//     (to, from) => {
+
+//     },
+//   ],
+// });
+
 const form = ref({
   email: "",
   password: "",
 });
 function submit() {
   axiosClient.post("auth/login", form.value).then((res) => {
+    // localStorage.setItem("token", res.data.token);
+    useCookie("token").value = res.data.token;
+    useCookie("userinfo").value = res.data.user;
     navigateTo("/");
     console.log(res.data);
   });

@@ -5,8 +5,9 @@ const axiosClient = axios.create({
   withCredentials: true,
 });
 
+// console.log(token);
 axiosClient.interceptors.request.use((config) => {
-  config.headers.Authorization = `Bearer kjhkj`;
+  config.headers.Authorization = `Bearer ${useCookie("token").value || ""}`;
   return config;
 });
 

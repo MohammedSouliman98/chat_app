@@ -5,46 +5,77 @@ const initsocket = (server) => {
   io = new Server(server, {
     cors: {
       origin: process.env.CLIENT_URL || "http://localhost:3000",
-      // Credential,
+      Credential: true,
     },
   });
 
-  var users = [];
-  var messages = [];
+  var messages = new Map();
+  const onlineusers = new Map();
 
   io.on("connection", (socket) => {
     console.log("connected");
 
-    // socket.join(`user-${socket.id}`);
-    console.log("connected user", socket.id);
+    // console.log("onlineusers :", onlineusers);
 
-    users.push(socket.id);
-    io.emit("update-users", users);
+    socket.on("register", (userId) => {
+      onlineusers.set(userId, socket.id);
+    });
 
     socket.on("send-message", (data) => {
-      const { recivedId, content } = data;
+      const { recivedId, content, senderId, date, username, color } = data;
 
       const message = {
+        type: "private",
         content: content,
-        senderId: socket.id,
+        senderId: senderId,
         recivedId: recivedId,
-        date: data.date,
-        color: data.color,
-        username: "ali",
+        date: date,
+        color: color,
+        username: username,
         recive: true,
       };
 
-      console.log(data);
-      io.to(`${recivedId}`).emit("recive-message", message);
-      // socket.emit("massege-sent", message);
+      messages.set(senderId, message);
+      console.log(message);
+      io.to(`${onlineusers.get(recivedId)}`).emit("recive-message", message);
     });
 
-    io.on("disconnect", () => {
-      console.log("disconnect user");
+    socket.on("join-room", (data) => {
+      socket.emit("message-room", messages);
+      let { room, userId, date, username } = data;
+      socket.join(room);
+      const welcomemessage = {
+        type: "room",
+        content: "welcome to our group",
+        date: new Date().toLocaleString(),
+        username: username,
+        color: "info",
+        recive: true,
+      };
 
-      user.pop(socket.id);
-      io.emit("update-users", users);
+      socket.to(room).emit("user-joined", welcomemessage);
+
+      socket.on("message-group", (m) => {
+        console.log(messages);
+
+        const { content, senderId, date, username, color } = m;
+        const messagegroup = {
+          type: "room",
+          senderId: senderId,
+          content: content,
+          date: date,
+          username: username,
+          color: color,
+          recive: true,
+        };
+        messages.set(room, messagegroup);
+        socket.to(room).emit("recive-message", messagegroup);
+      });
     });
+
+    // io.on("disconnect", () => {
+    //   console.log("disconnect user");
+    // });
   });
 
   return io;
