@@ -90,7 +90,7 @@ onMounted(() => {
       username: useCookie("userinfo").value.name,
     });
     socket.on("message-room", (m) => {
-      messages.value = m;
+      m ? (messages.value = m) : "";
       // console.log(m);
     });
     socket.on("user-joined", (data) => {
@@ -116,6 +116,7 @@ onMounted(() => {
 function logout() {
   axiosClient.post("auth/logout").then((res) => {
     useCookie("token").value = null;
+    navigateTo("/auth/login");
     console.log(res);
   });
 }
@@ -129,7 +130,7 @@ function scrollToTop() {
   chat.scrollTop = chat.scrollHeight;
 }
 
-function privatemessage() {
+async function privatemessage() {
   const messageforsend = {
     recivedId: parseInt(message.value.recivedId),
     content: message.value.content,
@@ -140,8 +141,9 @@ function privatemessage() {
     recive: message.value.recive,
   };
   socket.emit("send-message", messageforsend);
-  pushmessage(messageforsend);
+  await pushmessage(messageforsend);
   message.value.content = "";
+  scrollToTop();
 }
 
 async function groupmessage() {

@@ -39,15 +39,22 @@ function createAccessToken(user) {
 router.use(express.json());
 
 router.post("/register", async (req, res) => {
-  const { name, email, password } = req.body;
+  const { name, email, password, confirm } = req.body;
+
+  if (!name) {
+    return res.status(400).json({ message: "name field is require" });
+  }
 
   if (!email || !password) {
-    return res.status(400).json({ message: "enter email " });
+    return res.status(400).json({ message: "enter email and password" });
+  }
+  if (password !== confirm) {
+    return res.status(400).json({ message: "password not confirmed" });
   }
   try {
     const existingUser = await User.findOne({ where: { email } });
     if (existingUser) {
-      return res.status(400).json({ message: "User already exists" });
+      return res.status(401).json({ message: "User already exists" });
     }
     const hashpassword = await bcrypt.hash(password, 10);
     console.log("password : ", hashpassword);
@@ -71,7 +78,7 @@ router.post("/login", async (req, res) => {
   const { email, password } = req.body;
 
   if (!email || !password) {
-    return res.status(400).json({ message: "enter email " });
+    return res.status(400).json({ message: "enter email and password" });
   }
   try {
     const existingUser = await User.findOne({ where: { email } });

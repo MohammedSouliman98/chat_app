@@ -16,7 +16,7 @@
             class="p-2"
             v-model="selectedUser"
             id=""
-            :disabled="selectedRoom"
+            :disabled="selectedRoom !== null"
           >
             <option value="" disabled>select user</option>
             <option
@@ -30,8 +30,7 @@
           <SelectButton
             v-model="selectedRoom"
             :options="rooms"
-            @change="room"
-            :disabled="selectedUser"
+            :disabled="selectedUser !== null"
           />
           <Button
             label="Start chat"
@@ -47,10 +46,9 @@
 
 <script setup>
 import { ref } from "vue";
-import { io } from "socket.io-client";
 import axiosClient from "~/axios";
-const users = ref([]);
 
+const users = ref([]);
 const selectedUser = ref(null);
 const selectedColor = ref("warn");
 const selectedRoom = ref(null);
@@ -74,6 +72,7 @@ function startchat() {
 function logout() {
   axiosClient.post("auth/logout").then((res) => {
     useCookie("token").value = null;
+    navigateTo("/auth/login");
     console.log(res);
   });
 }
